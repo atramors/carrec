@@ -18,6 +18,8 @@ matplotlib = "*"
 opencv-python = "*"
 pillow = "*"
 ipykernel = "*"
+mlflow = "*"
+flask-sqlalchemy = "*"
 
 [requires]
 python_version = "3.7"
