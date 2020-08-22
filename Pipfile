@@ -4,7 +4,6 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-black = "*"
 
 [packages]
 flask = "*"
@@ -16,13 +15,6 @@ tensorflow = "*"
 sklearn = "*"
 matplotlib = "*"
 opencv-python = "*"
-pillow = "*"
-ipykernel = "*"
-mlflow = "*"
-flask-sqlalchemy = "*"
 
 [requires]
 python_version = "3.7"
-
-[pipenv]
-allow_prereleases = true
