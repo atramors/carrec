@@ -46,11 +46,11 @@ valid_dataset = keras.preprocessing.image_dataset_from_directory(
     batch_size=batch_size,
     image_size=(img_height, img_height),
 )
+
 # labels of cars acording the directory structure
 class_names = train_dataset.class_names
 
 # Configure the dataset for performance
-
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 train_dataset = train_dataset.cache().shuffle(2700).prefetch(buffer_size=AUTOTUNE)
 valid_dataset = valid_dataset.cache().prefetch(buffer_size=AUTOTUNE)
