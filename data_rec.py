@@ -4,17 +4,19 @@ import mlflow.tensorflow
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import pathlib
 import tensorflow as tf
-from pathlib import Path
 from tensorflow import keras
 from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
 
 
+# Initialise MLFlow
+# TODO: the current model performance is 0.0toosmallnumber.
+# Investigate simpler network architectures to reach better performance.
 mlflow.tensorflow.autolog()
 
 # Path to images
-DATA_DIR = Path(
+DATA_DIR = pathlib.Path(
     "/Users/atramors/desktop/My_Projects/datasets/car_DS/car_data/\
 car_data/train"
 )
@@ -57,7 +59,7 @@ valid_dataset = valid_dataset.cache().prefetch(buffer_size=AUTOTUNE)
 
 # Create the model
 
-model = Sequential(
+model = keras.Sequential(
     [
         # Data augmentation:
         # Generating additional training data from our existing examples by augmenting
