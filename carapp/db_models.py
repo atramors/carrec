@@ -8,7 +8,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     account_type = db.Column(db.String(20), nullable=False)
-    cars = db.relationship("Car", backref="author", lazy=True)
+    cars = db.relationship("Car", backref="user", lazy=True) 
 
     def __repr__(self):
         return f"User({self.username}, {self.email})"
@@ -17,12 +17,30 @@ class User(db.Model):
 class Car(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     car_title = db.Column(db.String(80), nullable=False)
-    car_info = db.Column(db.String(180), nullable=False)
-    car_picture = db.Column(db.String(20), nullable=True)
+    title = db.Column(db.String(180), nullable=False)
+    condition = db.Column(db.String(20), nullable=True)
+    body_type = db.Column(db.String(30), nullable=True)
+    brand = db.Column(db.String(20), nullable=True)
+    model = db.Column(db.String(20), nullable=True)
+    year_of_production = db.Column(db.String(20), nullable=True)
+    country_origin = db.Column(db.String(20), nullable=True)
+    country_now = db.Column(db.String(20), nullable=True)
+    city = db.Column(db.String(20), nullable=True)
+    mileage = db.Column(db.String(30), nullable=True)
+    technical_condition = db.Column(db.String(180), nullable=True)
+    gear_box = db.Column(db.String(20), nullable=True)
+    fuel_type = db.Column(db.String(20), nullable=True)
+    engine = db.Column(db.String(20), nullable=True)
+    color = db.Column(db.String(20), nullable=True)
+    safety = db.Column(db.String(180), nullable=True)
+    wanted = db.Column(db.String(10), nullable=True)
+    multimedia = db.Column(db.String(20), nullable=True)
+    comfort = db.Column(db.String(200), nullable=True)
+    picture = db.Column(db.String(20), nullable=True)
     date_added = db.Column(
         db.DateTime(), nullable=False, default=datetime.datetime.utcnow
     )
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     def __repr__(self):
-        return f"Car({self.title}, {self.car_picture}, {self.date_added})"
+        return f"Car({self.title}, {self.picture}, {self.date_added})"
