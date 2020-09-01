@@ -1,21 +1,39 @@
 import requests
 import carapp
+from carapp import api, app, bcrypt, db, db_models
+from carapp.db_models import User, Car
 from flask import request
 from flask_restful import Resource
-from carapp import app, db, bcrypt
+from webargs import fields
+from webargs.flaskparser import use_kwargs, parser
+
+user_detail_args = {
+    "id": fields.Int(),
+    "username": fields.Str(required=True),
+    "password": fields.Str(validate=lambda p: len(p) >= 5),
+    "email": fields.Str(required=True),
+    "account_type": fields.Str(required=True),
+}
 
 
 class UserData(Resource):
-    def put(self, user_id):
-        self.user = carapp.User(username,)
+    @use_kwargs(user_detail_args)
+    def get(self, args, uid):
+        result = User.query.get(id=uid)
+        return result
 
-    def get(self, user_id):
-        result = UserData.query.get(id=user_id)
-        return {"user_id": user_id}
+    @use_kwargs(user_detail_args)
+    def post(self, args, uid):
+        user = User(
+            id=uid,
+            username=args["username"],
+            password=args["password"],
+            email=args["email"],
+            account_type=args["account_type"],
+        )
+        db.session.add(user)
+        db.session.commit()
+        return user, 201
 
-    def delete(self, user_id):
-        pass
 
-
-carapp.add_resource(UserData, "/user/<string:user_id>")
-carapp.add_resource(CarData, "/user/<string:car_id>")
+api.add_resource(UserData, "/user/<int:uid>")
