@@ -3,11 +3,11 @@ import carapp
 from carapp import api, app, bcrypt, db, db_models
 from carapp.db_models import User, Car
 from flask import request
-from flask_restful import Resource
+from flask_restful import Resource, abort
 from webargs import fields
-from webargs.flaskparser import use_kwargs, parser
+from webargs.flaskparser import use_args, parser
 
-user_detail_args = {
+user_args = {
     "id": fields.Int(),
     "username": fields.Str(required=True),
     "password": fields.Str(validate=lambda p: len(p) >= 5),
@@ -16,13 +16,18 @@ user_detail_args = {
 }
 
 
+def abort_if_id_doesnt_exist(self, uid):
+    if uid not in User.query.filter_by(id=uid):
+        abort(404, message=f"User with id={uid} doesn't exist")
+
+
 class UserData(Resource):
-    @use_kwargs(user_detail_args)
+    @use_args(user_args)
     def get(self, args, uid):
         result = User.query.get(id=uid)
         return result
 
-    @use_kwargs(user_detail_args)
+    @use_args(user_args)
     def post(self, args, uid):
         user = User(
             id=uid,
@@ -33,7 +38,7 @@ class UserData(Resource):
         )
         db.session.add(user)
         db.session.commit()
-        return user, 201
+        return {"user": user, "status": 201}
 
 
 api.add_resource(UserData, "/user/<int:uid>")
