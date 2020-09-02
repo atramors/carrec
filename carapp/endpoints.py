@@ -1,11 +1,12 @@
 import requests
 import carapp
+import json
 from carapp import api, app, bcrypt, db, db_models
 from carapp.db_models import User, Car
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource, abort
 from webargs import fields
-from webargs.flaskparser import use_args, parser
+from webargs.flaskparser import use_args, use_kwargs
 
 user_args = {
     "id": fields.Int(),
@@ -16,21 +17,22 @@ user_args = {
 }
 
 
-def abort_if_id_doesnt_exist(self, uid):
-    if uid not in User.query.filter_by(id=uid):
-        abort(404, message=f"User with id={uid} doesn't exist")
-
-
 class UserData(Resource):
-    @use_args(user_args)
-    def get(self, args, uid):
-        result = User.query.get(id=uid)
-        return result
+    def get(self, user_id):
+        user = User.query.filter_by(id=user_id).first()
+        return (
+            {
+                "username": user.username,
+                "email": user.email,
+                "account_type": user.account_type,
+            },
+            200,
+        )
 
     @use_args(user_args)
-    def post(self, args, uid):
+    def post(self, args, **kwargs):
         user = User(
-            id=uid,
+            id=args["id"],
             username=args["username"],
             password=args["password"],
             email=args["email"],
@@ -38,7 +40,33 @@ class UserData(Resource):
         )
         db.session.add(user)
         db.session.commit()
-        return {"user": user, "status": 201}
+
+        return (
+            {
+                "username": user.username,
+                "email": user.email,
+                "account_type": user.account_type,
+            },
+            201,
+        )
+"""
+    @use_args(user_args)
+    def delete(self, user_id, args, **kwargs):
+        user = User.query.filter_by(id=args["id"]).first()
+        db.session.delete(user)
+        db.session.commit()
+
+        return f"User with Username {user.username} was deleted!", 204
 
 
-api.add_resource(UserData, "/user/<int:uid>")
+class UserList(Resource):
+    # @use_args(user_args)
+    def get(self, args):
+        users = User.query.all()
+        # for i in range(len(users)):
+        #     return users[i]
+        return users
+"""
+
+api.add_resource(UserData, "/user/<int:user_id>")
+api.add_resource(UserList, "/users")
