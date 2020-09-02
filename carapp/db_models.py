@@ -11,7 +11,7 @@ class User(db.Model):
     cars = db.relationship("Car", backref="user", lazy=True) 
 
     def __repr__(self):
-        return f"User({self.username}, {self.email})"
+        return f"User({self.username}, {self.email}, {self.account_type})"
 
 
 class Car(db.Model):
