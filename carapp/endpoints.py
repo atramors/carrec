@@ -34,15 +34,9 @@ class UserData(Resource):
             return {"Reason": "User not found", "user_id": user_id}, 404
         return result
         
-    @use_args(user_args)
-    def post(self, args, **kwargs):
-        user = User(
-            id=args["id"],
-            username=args["username"],
-            password=args["password"],
-            email=args["email"],
-            account_type=args["account_type"],
-        )
+    @use_kwargs(user_args)
+    def post(self, **kwargs):
+        user = User(**kwargs)
         db.session.add(user)
         db.session.commit()
         return (
@@ -71,5 +65,5 @@ class UserList(Resource):
         # return users
 
 
-api.add_resource(UserData, "/user/<int:user_id>")
+api.add_resource(UserData, "/user", "/user/<int:user_id>")
 api.add_resource(UserList, "/users")

@@ -19,6 +19,7 @@ flask-bcrypt = "*"
 buddy-config = "*"
 webargs = "*"
 flask-jwt-extended = "*"
+marshmallow = "*"
 
 [requires]
 python_version = "3.7"
