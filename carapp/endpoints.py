@@ -19,7 +19,6 @@ user_args = {
 
 
 class UserData(Resource):
-    # @marshal_with(user_args, envelope="resource")
     def get(self, user_id):
         user = User.query.get(user_id)
         try:
