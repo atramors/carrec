@@ -18,51 +18,48 @@ user_args = {
 }
 
 
+class UserSchema(Schema):
+    id = fields.Int()
+    username = fields.Str()
+    password = fields.Str()
+    email = fields.Email()
+    account_type = fields.Str()
+
+
+schema = UserSchema()
+
 class UserData(Resource):
     def get(self, user_id):
         user = User.query.get(user_id)
+        result = schema.dump(user)
         try:
-            result = (
-                {
-                    "username": user.username,
-                    "email": user.email,
-                    "account_type": user.account_type,
-                },
-                200,
-            )
+            result, 200
         except AttributeError:
             return {"Reason": "User not found", "user_id": user_id}, 404
         return result
-        
+
     @use_kwargs(user_args)
     def post(self, **kwargs):
         user = User(**kwargs)
         db.session.add(user)
         db.session.commit()
-        return (
-            {
-                "username": user.username,
-                "email": user.email,
-                "account_type": user.account_type,
-            },
-            201,
-        )
+        result = schema.dump(user)
+        return result, 201
 
     def delete(self, user_id):
-        user = User.query.filter_by(id=user_id).first()
+        user = User.query.get(user_id)
         db.session.delete(user)
         db.session.commit()
-        return (f"{user.username} was gone!", 204)
+        result = schema.dump(user)
+        return result["username"] + " was deleted!", 204
 
 
 class UserList(Resource):
-    @use_args(user_args)
-    def get(self, args, **kwargs):
-        users = User.query.order_by(username=args["username"]).all()
-        
-        for i in range(len(users)):
-            return users[i].username
-        # return users
+    def get(self):
+        users = User.query.all()
+        result = schema.dump(users)
+        return result["username"]
+            
 
 
 api.add_resource(UserData, "/user", "/user/<int:user_id>")
