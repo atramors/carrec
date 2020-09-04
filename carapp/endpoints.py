@@ -57,8 +57,8 @@ class UserData(Resource):
 class UserList(Resource):
     def get(self):
         users = User.query.all()
-        result = schema.dump(users)
-        return result["username"]
+        list_of_users = [schema.dump(user) for user in users]
+        return list_of_users
             
 
 
