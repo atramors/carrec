@@ -40,11 +40,10 @@ class UserData(Resource):
         user = User.query.get(user_id)
         result = schema.dump(user)
         try:
-            result, 200
-        except AttributeError:
-            logger.error(f"\nUser {result['username']}")
+            result["id"], 200
+        except KeyError:
             return {"Reason": "User not found", "user_id": user_id}, 404
-        logger.info(f"\nUser {result['username']} was called")
+        logger.info(f"\nUser with ID = {user_id} was called")
         return result
 
     @use_kwargs(user_args)
@@ -62,7 +61,7 @@ class UserData(Resource):
     def delete(self, user_id):
         try:
             user = User.query.get(user_id)
-            result = schema.dump(user) 
+            result = schema.dump(user)
         except someError:
             return {"Reason": "No User with such id here!"}, 404
         db.session.delete(user)
