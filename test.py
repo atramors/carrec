@@ -10,7 +10,7 @@ class TestRequestMethods(unittest.TestCase):
         with app.test_client() as client:
 
             test_user = MockUser()
-            test_user.get.return_value = {
+            test_user.query.return_value = {
                 "id": 112,
                 "email": "a1one@nosatana.com",
                 "account_type": "client",
@@ -20,14 +20,20 @@ class TestRequestMethods(unittest.TestCase):
 
             self.assertIsNotNone(response)
             self.assertIsInstance(response.get_json(), dict)
-            self.assertIsInstance(response.get_json()["id"], int)
-            self.assertNotIsInstance(response.get_json()["username"], int)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.get_json()["id"], 112)
-            self.assertNotEqual(response.get_json()["username"], "bingo")
-            self.assertIn("email", response.get_json())
-            self.assertNotIn("name", response.get_json())
-            
+
+    def test_get_user_failure(self, MockUser):
+        with app.test_client() as client:
+
+            test_user = MockUser()
+            test_user.query.return_value = {"Reason": "User not found", "user_id": 2}
+
+            response = client.get("/user/2")
+
+            self.assertIsNotNone(response)
+            self.assertIsInstance(response.get_json(), dict)
+            self.assertEqual(response.status_code, 404)
 
     # def test_get_all_users(self, user_id):
     #     return
