@@ -1,7 +1,5 @@
 import unittest
-import carapp
 import json
-from marshmallow import Schema, fields
 from unittest import mock
 from carapp import app, db, db_models, endpoints
 
@@ -14,8 +12,6 @@ class TestRequestMethods(unittest.TestCase):
             test_user = MockUser()
             test_user.get.return_value = {
                 "id": 112,
-                "username": "lalanda1",
-                "password": "12134",
                 "email": "a1one@nosatana.com",
                 "account_type": "client",
             }
@@ -24,8 +20,13 @@ class TestRequestMethods(unittest.TestCase):
 
             self.assertIsNotNone(response)
             self.assertIsInstance(response.get_json(), dict)
+            self.assertIsInstance(response.get_json()["id"], int)
+            self.assertNotIsInstance(response.get_json()["username"], int)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.get_json()["username"], "lalanda1")
+            self.assertEqual(response.get_json()["id"], 112)
+            self.assertNotEqual(response.get_json()["username"], "bingo")
+            self.assertIn("email", response.get_json())
+            self.assertNotIn("name", response.get_json())
             
 
     # def test_get_all_users(self, user_id):
