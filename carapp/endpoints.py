@@ -3,6 +3,7 @@ import carapp
 import json
 import logging
 from carapp import api, app, bcrypt, db
+# from carapp import db_models
 from carapp.db_models import User, Car
 from flask import request, jsonify
 from flask_restful import Resource
@@ -37,12 +38,13 @@ schema = UserSchema()
 
 class UserData(Resource):
     def get(self, user_id):
+        # Easier solution (check test.py)
+        # user = db_models.User.query.get(user_id)
         user = User.query.get(user_id)
-        result = schema.dump(user)
-        try:
-            result["id"], 200
-        except KeyError:
+        # import pdb; pdb.set_trace()
+        if user is None: # Comparision id of objects
             return {"Reason": "User not found", "user_id": user_id}, 404
+        result = schema.dump(user)
         logger.info(f"\nUser with ID = {user_id} was called")
         return result
 
