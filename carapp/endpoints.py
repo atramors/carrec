@@ -11,7 +11,6 @@ from webargs import fields
 from webargs.flaskparser import use_args, use_kwargs
 
 
-logging.getLogger().setLevel(logging.WARNING)
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__file__)
 
@@ -49,25 +48,24 @@ class UserData(Resource):
     @use_kwargs(user_args)
     def post(self, **kwargs):
         user = User(**kwargs)
-        try:
-            result = schema.dump(user)
-        except ValidationError as error:
-            logger.error(error.messages)
+        result = schema.dump(user)
         db.session.add(user)
         db.session.commit()
         logger.info(f"\nUser {result['username']} was created.")
         return result, 201
 
     def delete(self, user_id):
+        user = User.query.get(user_id)
+        result = schema.dump(user)
         try:
-            user = User.query.get(user_id)
-            result = schema.dump(user)
-        except someError:
+            result["username"]
+        except KeyError:
+            logger.error(f"\nNo User with ID={user_id} here!")
             return {"Reason": "No User with such id here!"}, 404
         db.session.delete(user)
         db.session.commit()
         logger.info(f"\nUser {result['username']} was deleted!")
-        return "", 204
+        return {}, 204
 
 
 class UserList(Resource):
