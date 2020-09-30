@@ -3,9 +3,10 @@ import json
 from unittest import mock
 from carapp import app, db, db_models, endpoints
 
+
 test_user = {
     "id": 100000,
-    "username": "Ken1",
+    "username": "Kenn",
     "account_type": "client",
 }
 
@@ -50,12 +51,23 @@ class TestRequestMethods(unittest.TestCase):
             self.assertEqual(response.status_code, 500)
 
     def test_post_user(self, MockUser):
+        tester = {
+            "id": 100000,
+            "username": "Barbie",
+            "password": "12134",
+            "email": "Barbie@satana666.com",
+            "account_type": "test-client",
+        }
         with app.test_client() as client:
-            MockUser.return_value = test_user
-            response = client.post("/user", json=test_user)
-            self.assertIsNotNone(response)
-            # self.assertIsInstance(response.get_json(), dict)
-            # self.assertEqual(response.status_code, 201)
+            MockUser.return_value = tester
+            response = client.post("/user", json=tester)
+            import pdb
+
+            pdb.set_trace()
+            self.assertIsNotNone(response.get_json())
+            self.assertEqual(response.data, tester)
+            self.assertEqual(response.status_code, 201)
+            self.assertIsInstance(response.get_json(), dict)
 
     def test_delete_user(self, MockUser):
         with app.test_client() as client:
