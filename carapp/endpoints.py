@@ -60,7 +60,7 @@ class UserData(Resource):
         user = User.query.get(user_id)
         result = schema.dump(user)
         try:
-            result["username"]
+            result["id"]
         except KeyError:
             logger.error(f"\nNo User with ID={user_id} here!")
             return {"Reason": "No User with such id here!"}, 404
@@ -68,6 +68,22 @@ class UserData(Resource):
         db.session.commit()
         logger.info(f"\nUser {result['username']} was deleted!")
         return {}, 204
+
+    @use_kwargs(user_args)
+    def patch(self, user_id, **kwargs):
+        user = User.query.get(user_id) # Checking for User existance
+        result = schema.dump(user)
+        try:
+            result["id"]
+        except KeyError:
+            logger.error(f"\nNo User with ID={user_id} here!")
+            return {"Reason": "No User with such id here!"}, 404
+
+        user = User(**kwargs) 
+        result = schema.dump(user)
+        db.session.commit()
+        logger.info(f"\nUser {result['username']} was updated!")
+        return result, 200
 
 
 class UserList(Resource):
