@@ -78,9 +78,10 @@ class UserData(Resource):
         except KeyError:
             logger.error(f"\nNo User with ID={user_id} here!")
             return {"Reason": "No User with such id here!"}, 404
-
-        user = User(**kwargs) 
+        
+        user = User(**kwargs)
         result = schema.dump(user)
+        db.session.merge(user)
         db.session.commit()
         logger.info(f"\nUser {result['username']} was updated!")
         return result, 200
