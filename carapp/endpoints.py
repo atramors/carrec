@@ -40,7 +40,6 @@ class UserData(Resource):
         # Easier solution (check test.py)
         # user = db_models.User.query.get(user_id)
         user = User.query.get(user_id)
-        # import pdb; pdb.set_trace()
         if user is None: # Comparision id of objects
             return {"Reason": "User not found", "user_id": user_id}, 404
         result = schema.dump(user)
@@ -70,20 +69,14 @@ class UserData(Resource):
         return {}, 204
 
     @use_kwargs(user_args)
-    def patch(self, user_id, **kwargs):
-        user = User.query.get(user_id) # Checking for User existance
-        result = schema.dump(user)
-        try:
-            result["id"]
-        except KeyError:
+    def put(self, user_id, **kwargs):
+        user_updated = User.query.filter_by(id=user_id).update(kwargs)
+        if not user_updated:
             logger.error(f"\nNo User with ID={user_id} here!")
-            return {"Reason": "No User with such id here!"}, 404
-        
-        user = User(**kwargs)
-        result = schema.dump(user)
-        db.session.merge(user)
+            return {"Reason": "No such User", "UserId": user_id}, 404
+        result = schema.load({**{"id": user_id}, **kwargs})
         db.session.commit()
-        logger.info(f"\nUser {result['username']} was updated!")
+        logger.info(f"\nUser with ID={user_id} was updated!")
         return result, 200
 
 
