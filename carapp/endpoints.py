@@ -3,6 +3,7 @@ import carapp
 import json
 import logging
 from carapp import api, app, bcrypt, db
+
 # from carapp import db_models
 from carapp.db_models import User, Car
 from flask import request, jsonify
@@ -40,20 +41,11 @@ class UserData(Resource):
         # Easier solution (check test.py)
         # user = db_models.User.query.get(user_id)
         user = User.query.get(user_id)
-        if user is None: # Comparision id of objects
-            return {"Reason": "User not found", "user_id": user_id}, 404
+        if user is None:  # Comparision id of objects
+            return {"Reason": "User not found", "User_id": user_id}, 404
         result = schema.dump(user)
-        logger.info(f"\nUser with ID = {user_id} was called")
+        logger.info(f"\nUser with id={user_id} was called")
         return result
-
-    @use_kwargs(user_args)
-    def post(self, **kwargs):
-        user = User(**kwargs)
-        result = schema.dump(user)
-        db.session.add(user)
-        db.session.commit()
-        logger.info(f"\nUser {result['username']} was created.")
-        return result, 201
 
     def delete(self, user_id):
         user = User.query.get(user_id)
@@ -61,22 +53,22 @@ class UserData(Resource):
         try:
             result["id"]
         except KeyError:
-            logger.error(f"\nNo User with ID={user_id} here!")
-            return {"Reason": "No User with such id here!"}, 404
+            logger.error(f"\nNo User with id={user_id}")
+            return {"Reason": f"No User with id={user_id}"}, 404
         db.session.delete(user)
         db.session.commit()
-        logger.info(f"\nUser {result['username']} was deleted!")
-        return {}, 204
+        logger.info(f"\nUser with id={user_id} deleted")
+        return "", 204
 
     @use_kwargs(user_args)
     def put(self, user_id, **kwargs):
-        user_updated = User.query.filter_by(id=user_id).update(kwargs)
+        user_updated = User.query.filter_by(id=user_id).update(kwargs) # 0 or 1 (if updated)
         if not user_updated:
-            logger.error(f"\nNo User with ID={user_id} here!")
-            return {"Reason": "No such User", "UserId": user_id}, 404
+            logger.error(f"\nNo User with id={user_id}")
+            return {"Reason": "No such User", "User_id": user_id}, 404
         result = schema.load({**{"id": user_id}, **kwargs})
         db.session.commit()
-        logger.info(f"\nUser with ID={user_id} was updated!")
+        logger.info(f"\nUser with id={user_id} updated")
         return result, 200
 
 
@@ -84,9 +76,18 @@ class UserList(Resource):
     def get(self):
         users = User.query.all()
         list_of_users = [schema.dump(user) for user in users]
-        logger.info("\nAll users were called.")
-        return list_of_users
+        logger.info(f"\nList of Users: {list_of_users}")
+        return {"Users": list_of_users}
+
+    @use_kwargs(user_args)
+    def post(self, **kwargs):
+        user = User(**kwargs)
+        result = schema.dump(user)
+        db.session.add(user)
+        db.session.commit()
+        logger.info(f"\nUser with id={result['id']} created")
+        return result, 201
 
 
-api.add_resource(UserData, "/user", "/user/<int:user_id>")
+api.add_resource(UserData, "/users/<int:user_id>")
 api.add_resource(UserList, "/users")
