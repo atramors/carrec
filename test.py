@@ -73,7 +73,7 @@ class TestRequestMethods(unittest.TestCase):
             "account_type": "test-client",
         }
         with app.test_client() as client:
-            MockUser.filter_by.update.return_value = tester
+            MockUser.query.filter_by.update.return_value = tester
             response = client.put("/users/100000", json=tester)
             self.assertIsNotNone(response.get_json())
             self.assertIsInstance(response.get_json(), dict)
