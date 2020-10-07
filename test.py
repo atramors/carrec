@@ -15,10 +15,12 @@ test_user = {
 # Easier solution (check endpoints.py)
 # @mock.patch("carapp.db_models.User")
 class TestRequestMethods(unittest.TestCase):
+    maxDiff = None
+
     def test_get_user(self, MockUser):
         with app.test_client() as client:
             MockUser.query.get.return_value = test_user
-            response = client.get("/user/100000")
+            response = client.get("/users/100000")
             self.assertIsNotNone(response)
             self.assertIsInstance(response.get_json(), dict)
             self.assertEqual(response.status_code, 200)
@@ -27,7 +29,7 @@ class TestRequestMethods(unittest.TestCase):
     def test_get_user_failure(self, MockUser):
         with app.test_client() as client:
             MockUser.query.get.return_value = None
-            response = client.get("/user/100000")
+            response = client.get("/users/100000")
             self.assertIsNotNone(response)
             self.assertIsInstance(response.get_json(), dict)
             self.assertEqual(response.status_code, 404)
@@ -39,18 +41,13 @@ class TestRequestMethods(unittest.TestCase):
             ]
             response = client.get("/users")
             self.assertIsNotNone(response)
-            self.assertIsInstance(response.get_json()[0], dict)
             self.assertEqual(response.status_code, 200)
-
-    def test_get_all_users_failure(self, MockUser):
-        with app.test_client() as client:
-            MockUser.query.all.return_value = None
-            response = client.get("/users")
-            self.assertIsNotNone(response)
             self.assertIsInstance(response.get_json(), dict)
-            self.assertEqual(response.status_code, 500)
+            self.assertIsInstance(response.get_json()["Users"][0], dict)
+            self.assertEqual(response.get_json()["Users"][0], test_user)
 
-    def test_post_user(self, MockUser):
+    @mock.patch("carapp.db.session")
+    def test_post_user(self, MockSession, MockUser):
         tester = {
             "id": 100000,
             "username": "Barbie",
@@ -60,31 +57,43 @@ class TestRequestMethods(unittest.TestCase):
         }
         with app.test_client() as client:
             MockUser.return_value = tester
-            response = client.post("/user", json=tester)
-            import pdb
-
-            pdb.set_trace()
+            response = client.post("/users", json=tester)
             self.assertIsNotNone(response.get_json())
-            self.assertEqual(response.data, tester)
-            self.assertEqual(response.status_code, 201)
             self.assertIsInstance(response.get_json(), dict)
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.get_json(), tester)
 
-    def test_delete_user(self, MockUser):
+    @mock.patch("carapp.db.session")
+    def test_put_user(self, MockSession, MockUser):
+        tester = {
+            "id": 100000,
+            "username": "Barbie",
+            "password": "12134",
+            "email": "Barbie@satana666.com",
+            "account_type": "test-client",
+        }
+        with app.test_client() as client:
+            MockUser.filter_by.update.return_value = tester
+            response = client.put("/users/100000", json=tester)
+            self.assertIsNotNone(response.get_json())
+            self.assertIsInstance(response.get_json(), dict)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.get_json(), tester)
+
+    @mock.patch("carapp.db.session")
+    def test_delete_user(self, MockSession, MockUser):
         with app.test_client() as client:
             MockUser.query.get.return_value = test_user
-            response = client.delete("/user/100000")
+            response = client.delete("/users/100000")
             self.assertIsNotNone(response)
-            self.assertIsInstance(response.get_json(), dict)
-            # self.assertEqual(response.status_code, 204)
-            # self.assertEqual(response.get_json(), {})
+            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.data, b"")
 
     def test_delete_user_failure(self, MockUser):
         with app.test_client() as client:
             MockUser.query.get.return_value = None
-            response = client.delete("/user/100000")
+            response = client.delete("/users/100000")
             self.assertIsNotNone(response)
             self.assertIsInstance(response.get_json(), dict)
             self.assertEqual(response.status_code, 404)
-            self.assertEqual(
-                response.get_json(), {"Reason": "No User with such id here!"}
-            )
+            self.assertEqual(response.get_json(), {"Reason": "No User with id=100000"})
