@@ -1,3 +1,4 @@
+import flask
 import logging
 import webargs.fields
 from carapp import api, app, bcrypt, db
@@ -6,6 +7,7 @@ from carapp import api, app, bcrypt, db
 from carapp.db_models import User, Car
 from flask_restful import Resource
 from marshmallow import Schema, fields, validate
+from sqlalchemy import text
 from webargs.flaskparser import use_kwargs
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
@@ -14,7 +16,6 @@ logger = logging.getLogger(__file__)
 user_args = {
     "id": webargs.fields.Int(),
     "username": webargs.fields.Str(required=True),
-    "password": webargs.fields.Str(required=True),
     "email": webargs.fields.Str(required=True),
     "account_type": webargs.fields.Str(required=True),
 }
@@ -42,7 +43,11 @@ car_args = {
     "multimedia": webargs.fields.Str(required=True),
     "comfort": webargs.fields.Str(required=True),
     "picture": webargs.fields.Str(required=True),
-    "date_added": webargs.fields.DateTime(format="%(asctime)"),
+    "price": webargs.fields.Str(required=True),
+    "drivetrain": webargs.fields.Str(required=True),
+    "warranty": webargs.fields.Str(required=True),
+    "fuel_consumption": webargs.fields.Str(required=True),
+    "date_added": webargs.fields.DateTime(),
     "user_id": webargs.fields.Int(),
 }
 
@@ -50,7 +55,6 @@ car_args = {
 class UserSchema(Schema):
     id = fields.Int()
     username = fields.Str(validate=[validate.Length(min=3, max=20)])
-    password = fields.Str(validate=[validate.Length(min=5, max=36)])
     email = fields.Email(required=True)
     account_type = fields.Str(required=True)
 
@@ -78,8 +82,8 @@ class CarSchema(Schema):
     multimedia = fields.Str(required=True)
     comfort = fields.Str(required=True)
     picture = fields.Str(required=True)
-    date_added = fields.DateTime(dump_only=True)
-    user_id = fields.Nested(UserSchema)
+    date_added = fields.DateTime()
+    user_id = fields.Nested("UserSchema", only=("id",))
 
 
 schema = UserSchema()
@@ -142,17 +146,12 @@ class UserList(Resource):
 
 
 class CarData(Resource):
-#    @use_kwargs(car_args)
-#    def get(self, color):
-#        import pdb
-#        pdb.set_trace()
-#        car = Car.query.filter_by(id=id)
-#        if car is None:  # Comparision id of objects
-#            return {"Reason": "Car not found", "Car_id": id}, 404
-#        result = car_schema.dump(car)
-#        logger.info(f"\nCar with id={result[id]} was called")
-#        return result.x
-#
+    #    def get(self):
+    #        cars = Car.query.filter(Car.color == color.title()).all()
+    #        result = [car_schema.dump(car) for car in cars]
+    #        logger.info(f"\n{color.title()} cars called")
+    #        return result
+    #
     def delete(self, id):
         car = Car.query.get(id)
         result = car_schema.dump(car)
@@ -166,6 +165,18 @@ class CarData(Resource):
         logger.info(f"\nCar with id={id} deleted")
         return "", 204
 
+    @use_kwargs(car_args)
+    def put(self, id, **kwargs):
+        # 0 or 1 (if updated)
+        car_updated = Car.query.filter_by(id=id).update(kwargs)
+        if not car_updated:
+            logger.error(f"\nNo Car with id={id}")
+            return {"Reason": "No such Car", "Car_id": id}, 404
+        result = car_schema.load({**{"id": id}, **kwargs})
+        db.session.commit()
+        logger.info(f"\nCar with id={id} updated")
+        return result, 200
+
 
 class CarList(Resource):
     def get(self):
@@ -176,14 +187,29 @@ class CarList(Resource):
     @use_kwargs(car_args)
     def post(self, **kwargs):
         car = Car(**kwargs)
+        x=db.session.add(car)
+        y=db.session.commit()
+
+        import pdb; pdb.set_trace() 
         result = car_schema.dump(car)
-        db.session.add(car)
-        db.session.commit()
-        logger.info(f"\nCar for User with id={result['user_id']} added")
+        # logger.info(f"\nCar for User with id={result["user_id"]["id"]} added")
         return result, 201
 
 
+class CarFilter(Resource):
+    pass
+
+
+#     def get(self, col, search_data):
+#         import pdb; pdb.set_trace()
+#         cars = Car.query.filter(text(data_c).params(data_c = search_data)).all()
+#         result = [car_schema.dump(car) for car in cars]
+#         # logger.info(f"\nCar with id={result[id]} was called")
+#         return result
+#
+#
 api.add_resource(UserData, "/users/<int:user_id>")
 api.add_resource(UserList, "/users")
-api.add_resource(CarData, "/cars/<string:color>", "/cars/<int:id>")
+api.add_resource(CarData, "/cars/<int:id>")
 api.add_resource(CarList, "/cars")
+api.add_resource(CarFilter, "/cars/filters/<col>=<search_data>")
