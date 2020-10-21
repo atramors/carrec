@@ -16,6 +16,7 @@ logger = logging.getLogger(__file__)
 user_args = {
     "id": webargs.fields.Int(),
     "username": webargs.fields.Str(required=True),
+    "password": webargs.fields.Str(required=True),
     "email": webargs.fields.Str(required=True),
     "account_type": webargs.fields.Str(required=True),
 }
@@ -82,8 +83,12 @@ class CarSchema(Schema):
     multimedia = fields.Str(required=True)
     comfort = fields.Str(required=True)
     picture = fields.Str(required=True)
+    price = fields.Str(required=True)
+    drivetrain = fields.Str(required=True)
+    warranty = fields.Str(required=True)
+    fuel_consumption = fields.Str(required=True)
     date_added = fields.DateTime()
-    user_id = fields.Nested("UserSchema", only=("id",))
+    user_id = fields.Nested("UserSchema")
 
 
 schema = UserSchema()
@@ -138,9 +143,9 @@ class UserList(Resource):
     @use_kwargs(user_args)
     def post(self, **kwargs):
         user = User(**kwargs)
-        result = schema.dump(user)
         db.session.add(user)
         db.session.commit()
+        result = schema.dump(user)
         logger.info(f"\nUser with id={result['id']} created")
         return result, 201
 
@@ -168,6 +173,7 @@ class CarData(Resource):
     @use_kwargs(car_args)
     def put(self, id, **kwargs):
         # 0 or 1 (if updated)
+        import pdb; pdb.set_trace() 
         car_updated = Car.query.filter_by(id=id).update(kwargs)
         if not car_updated:
             logger.error(f"\nNo Car with id={id}")
@@ -187,12 +193,12 @@ class CarList(Resource):
     @use_kwargs(car_args)
     def post(self, **kwargs):
         car = Car(**kwargs)
-        x=db.session.add(car)
-        y=db.session.commit()
+        db.session.add(car)
+        db.session.commit()
 
         import pdb; pdb.set_trace() 
         result = car_schema.dump(car)
-        # logger.info(f"\nCar for User with id={result["user_id"]["id"]} added")
+        # logger.info(f"\nCar for User with id=result["user_id"]["id"] added")
         return result, 201
 
 
