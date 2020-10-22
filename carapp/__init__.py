@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 
 app = Flask(__name__)
 api = Api(app)
-app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql+psycopg2://karmaroma:'\
+app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql+psycopg2://:I159'\
         'postgres@localhost:5432/new_carapp_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)

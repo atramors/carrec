@@ -1,14 +1,16 @@
-import flask
 import logging
-import webargs.fields
-from carapp import api, app, bcrypt, db
 
-# from carapp import db_models
-from carapp.db_models import User, Car
+import flask
+import webargs.fields
 from flask_restful import Resource
 from marshmallow import Schema, fields, validate
 from sqlalchemy import text
 from webargs.flaskparser import use_kwargs
+
+from carapp import api, app, bcrypt, db
+
+# from carapp import db_models
+from carapp.db_models import Car, User
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__file__)
@@ -22,7 +24,6 @@ user_args = {
 }
 
 car_args = {
-    "id": webargs.fields.Int(),
     "car_title": webargs.fields.Str(required=True),
     "title": webargs.fields.Str(required=True),
     "condition": webargs.fields.Str(required=True),
@@ -88,7 +89,7 @@ class CarSchema(Schema):
     warranty = fields.Str(required=True)
     fuel_consumption = fields.Str(required=True)
     date_added = fields.DateTime()
-    user_id = fields.Nested("UserSchema")
+    user_id = fields.Int()
 
 
 schema = UserSchema()
@@ -132,14 +133,6 @@ class UserData(Resource):
         logger.info(f"\nUser with id={user_id} updated")
         return result, 200
 
-
-class UserList(Resource):
-    def get(self):
-        users = User.query.all()
-        list_of_users = [schema.dump(user) for user in users]
-        logger.info(f"\nList of Users: {list_of_users}")
-        return {"Users": list_of_users}
-
     @use_kwargs(user_args)
     def post(self, **kwargs):
         user = User(**kwargs)
@@ -148,6 +141,14 @@ class UserList(Resource):
         result = schema.dump(user)
         logger.info(f"\nUser with id={result['id']} created")
         return result, 201
+
+
+class UserList(Resource):
+    def get(self):
+        users = User.query.all()
+        list_of_users = [schema.dump(user) for user in users]
+        logger.info(f"\nList of Users: {list_of_users}")
+        return {"Users": list_of_users}
 
 
 class CarData(Resource):
@@ -173,7 +174,6 @@ class CarData(Resource):
     @use_kwargs(car_args)
     def put(self, id, **kwargs):
         # 0 or 1 (if updated)
-        import pdb; pdb.set_trace() 
         car_updated = Car.query.filter_by(id=id).update(kwargs)
         if not car_updated:
             logger.error(f"\nNo Car with id={id}")
@@ -183,23 +183,22 @@ class CarData(Resource):
         logger.info(f"\nCar with id={id} updated")
         return result, 200
 
-
-class CarList(Resource):
-    def get(self):
-        cars = Car.query.all()
-        list_of_cars = [car_schema.dump(car) for car in cars]
-        return {"Cars": list_of_cars}
-
     @use_kwargs(car_args)
     def post(self, **kwargs):
         car = Car(**kwargs)
         db.session.add(car)
         db.session.commit()
 
-        import pdb; pdb.set_trace() 
         result = car_schema.dump(car)
         # logger.info(f"\nCar for User with id=result["user_id"]["id"] added")
         return result, 201
+
+
+class CarList(Resource):
+    def get(self):
+        cars = Car.query.all()
+        list_of_cars = [car_schema.dump(car) for car in cars]
+        return {"Cars": list_of_cars}
 
 
 class CarFilter(Resource):
@@ -214,8 +213,12 @@ class CarFilter(Resource):
 #         return result
 #
 #
-api.add_resource(UserData, "/users/<int:user_id>")
-api.add_resource(UserList, "/users")
-api.add_resource(CarData, "/cars/<int:id>")
-api.add_resource(CarList, "/cars")
+api.add_resource(
+    UserData, "/user", "/user/<int:user_id>", methods=["GET", "POST", "PUT", "DELETE"]
+)
+api.add_resource(UserList, "/users", methods=["GET"])
+api.add_resource(
+    CarData, "/car", "/car/<int:id>", methods=["GET", "POST", "PUT", "DELETE"]
+)
+api.add_resource(CarList, "/cars", methods=["GET"])
 api.add_resource(CarFilter, "/cars/filters/<col>=<search_data>")

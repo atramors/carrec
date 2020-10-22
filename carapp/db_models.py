@@ -1,4 +1,5 @@
 import datetime
+from sqlalchemy.orm import relationship
 from carapp import db
 
 
@@ -47,4 +48,4 @@ class Car(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     def __repr__(self):
-        return f"Car({self.title}, {self.picture}, {self.price})"
+        return f"Car({self.title}, {self.picture}, {self.price}, {self.user_id})"
