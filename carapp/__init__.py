@@ -1,10 +1,9 @@
 import flask_bcrypt as fb
-import flask_migrate
+from flask_migrate import Migrate
 from flask import Flask
-from flask_restful import Resource, Api
+from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from os.path import expanduser
-from sqlalchemy import create_engine
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,6 +15,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 bcrypt = fb.Bcrypt(app)
-migrate = flask_migrate.Migrate(app, db)
+migrate = Migrate(app, db)
 
 from carapp import endpoints
