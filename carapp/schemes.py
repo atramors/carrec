@@ -4,7 +4,8 @@ from marshmallow import Schema, fields, validate
 
 
 """
-Function to handle validation error.
+Function to handle silent validation error.
+Get json with error instead
 """
 
 
@@ -71,13 +72,6 @@ car_args = {
 Schema for filter-arguments parsing and validation of HTTP request
 objects (Query Params).
 """
-
-
-# def must_exist(val):
-#     if Car.query.filter_by(val).all() == []:
-#         # Optionally pass a status_code
-#         raise ValidationError("Car does not exist")
-
 
 filter_args = {
     "car_title": fields.Str(validate=lambda value: len(value) > 0),
