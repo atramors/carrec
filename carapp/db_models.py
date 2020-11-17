@@ -9,7 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     account_type = db.Column(db.String(20), nullable=False)
-    cars = db.relationship("Car", backref="user", lazy=True) 
+    cars = db.relationship("Car", backref="user", lazy=True)
 
     def __repr__(self):
         return f"User({self.username}, {self.email}, {self.account_type})"
@@ -48,4 +48,5 @@ class Car(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     def __repr__(self):
-        return f"Car({self.title}, {self.picture}, {self.price}, {self.user_id})"
+        return f"Car({self.title}, {self.picture}, {self.price}, \
+                {self.user_id})"
