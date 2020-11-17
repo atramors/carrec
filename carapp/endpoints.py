@@ -1,17 +1,6 @@
 import logging
 from flask_restful import Resource
-<<<<<<< HEAD
-<<<<<<< HEAD
-from marshmallow import Schema, fields, validate
-from sqlalchemy import text
-from webargs.flaskparser import use_kwargs
-
-=======
->>>>>>> b971c17... new schema and add validation
-from carapp import api, app, bcrypt, db
-=======
 from carapp import api, db
->>>>>>> 20e885b... Refactoring
 from carapp.db_models import Car, User
 from carapp.schemes import user_args, car_args, filter_args, user_schema, \
         car_schema
@@ -122,26 +111,11 @@ class CarData(Resource):
 
 
 class CarList(Resource):
-<<<<<<< HEAD
-    def get(self):
-<<<<<<< HEAD
-<<<<<<< HEAD
-        cars = Car.query.all()
-        list_of_cars = [car_schema.dump(car) for car in cars]
-=======
-        kwargs = request.args # get all parameters
-=======
-        kwargs = request.args  # get all parameters
->>>>>>> 2a62137... Filters works
-        car_list = Car.query.filter_by(**kwargs).all()
-=======
     @use_kwargs(filter_args, location="query")
     def get(self, **filter_args):
         car_list = Car.query.filter_by(**filter_args).all()
->>>>>>> b971c17... new schema and add validation
         list_of_cars = [car_schema.dump(car) for car in car_list]
         logger.info(f"\nGet {len(list_of_cars)} cars")
->>>>>>> e9e1275... Filters works
         return {"Cars": list_of_cars}
 
 
