@@ -37,9 +37,8 @@ class UserData(Resource):
 
     @use_kwargs(user_args)
     def put(self, user_id, **kwargs):
-        user_updated = User.query.filter_by(id=user_id).update(
-            kwargs
-        )  # 0 or 1 (if updated)
+        # 0 or 1 (if updated)
+        user_updated = User.query.filter_by(id=user_id).update(kwargs)
         if not user_updated:
             logger.error(f"\nNo User with id={user_id}")
             return {"Reason": "No such User", "User_id": user_id}, 404
