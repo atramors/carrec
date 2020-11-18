@@ -2,7 +2,6 @@ import logging
 from flask_restful import Resource
 from carapp import api, db, db_models, schemes
 from webargs.flaskparser import use_kwargs
-# from carapp import db_models
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__file__)
@@ -10,8 +9,6 @@ logger = logging.getLogger(__file__)
 
 class UserData(Resource):
     def get(self, user_id):
-        # Easier solution (check test.py)
-        # user = db_models.User.query.get(user_id)
         user = db_models.User.query.get(user_id)
         if user is None:  # Comparision id of objects
             return {"Reason": "User not found", "User_id": user_id}, 404
