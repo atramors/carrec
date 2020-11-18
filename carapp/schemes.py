@@ -14,17 +14,14 @@ Get json with error instead
 def handle_error(err):
     headers = err.data.get("headers", None)
     messages = err.data.get("messages", ["Invalid request."])
-    if headers:
-        return jsonify({"errors": messages}), err.code, headers
-    else:
-        return jsonify({"errors": messages}), err.code
+    return jsonify({"errors": messages}), err.code, headers
 
 
 """
 Schema for user-arguments parsing and validation of HTTP request objects.
 """
 
-user_args = {
+USER_ARGS = {
     "id": fields.Int(),
     "username": fields.Str(required=True),
     "password": fields.Str(required=True),
@@ -37,7 +34,7 @@ user_args = {
 Schema for car-arguments parsing and validation of HTTP request objects.
 """
 
-car_args = {
+CAR_ARGS = {
     "car_title": fields.Str(required=True),
     "title": fields.Str(required=True),
     "condition": fields.Str(required=True),
@@ -73,7 +70,7 @@ Schema for filter-arguments parsing and validation of HTTP request
 objects (Query Params).
 """
 
-filter_args = {
+FILTER_ARGS = {
     "car_title": fields.Str(validate=lambda value: len(value) > 0),
     "title": fields.Str(validate=lambda value: len(value) > 0),
     "condition": fields.Str(validate=lambda value: len(value) > 0),
@@ -137,5 +134,5 @@ class CarSchema(Schema):
     user_id = fields.Int()
 
 
-user_schema = UserSchema()
-car_schema = CarSchema()
+USER_SCHEMA = UserSchema()
+CAR_SCHEMA = CarSchema()

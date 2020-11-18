@@ -1,9 +1,6 @@
 import logging
 from flask_restful import Resource
-from carapp import api, db
-from carapp.db_models import Car, User
-from carapp.schemes import user_args, car_args, filter_args, user_schema, \
-        car_schema
+from carapp import api, db, db_models, schemes
 from webargs.flaskparser import use_kwargs
 # from carapp import db_models
 
@@ -15,16 +12,16 @@ class UserData(Resource):
     def get(self, user_id):
         # Easier solution (check test.py)
         # user = db_models.User.query.get(user_id)
-        user = User.query.get(user_id)
+        user = db_models.User.query.get(user_id)
         if user is None:  # Comparision id of objects
             return {"Reason": "User not found", "User_id": user_id}, 404
-        result = user_schema.dump(user)
+        result = schemes.USER_SCHEMA.dump(user)
         logger.info(f"\nUser with id={user_id} was called")
         return result
 
     def delete(self, user_id):
-        user = User.query.get(user_id)
-        result = user_schema.dump(user)
+        user = db_models.User.query.get(user_id)
+        result = schemes.USER_SCHEMA.dump(user)
         try:
             result["id"]
         except KeyError:
@@ -35,48 +32,49 @@ class UserData(Resource):
         logger.info(f"\nUser with id={user_id} deleted")
         return "", 204
 
-    @use_kwargs(user_args)
+    @use_kwargs(schemes.USER_ARGS)
     def put(self, user_id, **kwargs):
         # 0 or 1 (if updated)
-        user_updated = User.query.filter_by(id=user_id).update(kwargs)
+        user_updated = \
+                db_models.User.query.filter_by(id=user_id).update(kwargs)
         if not user_updated:
             logger.error(f"\nNo User with id={user_id}")
             return {"Reason": "No such User", "User_id": user_id}, 404
-        result = user_schema.load({**{"id": user_id}, **kwargs})
+        result = schemes.USER_SCHEMA.load({**{"id": user_id}, **kwargs})
         db.session.commit()
         logger.info(f"\nUser with id={user_id} updated")
         return result, 200
 
-    @use_kwargs(user_args)
+    @use_kwargs(schemes.USER_ARGS)
     def post(self, **kwargs):
-        user = User(**kwargs)
+        user = db_models.User(**kwargs)
         db.session.add(user)
         db.session.commit()
-        result = user_schema.dump(user)
+        result = schemes.USER_SCHEMA.dump(user)
         logger.info(f"\nUser with id={result['id']} created")
         return result, 201
 
 
 class UserList(Resource):
     def get(self):
-        users = User.query.all()
-        list_of_users = [user_schema.dump(user) for user in users]
+        users = db_models.User.query.all()
+        list_of_users = [schemes.USER_SCHEMA.dump(user) for user in users]
         logger.info(f"\nList of Users: {list_of_users}")
         return {"Users": list_of_users}
 
 
 class CarData(Resource):
     def get(self, id):
-        car = Car.query.get(id)
+        car = db_models.Car.query.get(id)
         if car is None:  # Comparision id of objects
             return {"Reason": "Car not found", "Car_id": id}, 404
-        result = car_schema.dump(car)
+        result = schemes.CAR_SCHEMA.dump(car)
         logger.info(f"\nCar with id={id} was called")
         return result
 
     def delete(self, id):
-        car = Car.query.get(id)
-        result = car_schema.dump(car)
+        car = db_models.Car.query.get(id)
+        result = schemes.CAR_SCHEMA.dump(car)
         try:
             result["id"]
         except KeyError:
@@ -87,33 +85,33 @@ class CarData(Resource):
         logger.info(f"\nCar with id={id} deleted")
         return "", 204
 
-    @use_kwargs(car_args)
+    @use_kwargs(schemes.CAR_ARGS)
     def put(self, id, **kwargs):
         # 0 or 1 (if updated)
-        car_updated = Car.query.filter_by(id=id).update(kwargs)
+        car_updated = db_models.Car.query.filter_by(id=id).update(kwargs)
         if not car_updated:
             logger.error(f"\nNo Car with id={id}")
             return {"Reason": "No such Car", "Car_id": id}, 404
-        result = car_schema.load({**{"id": id}, **kwargs})
+        result = schemes.CAR_SCHEMA.load({**{"id": id}, **kwargs})
         db.session.commit()
         logger.info(f"\nCar with id={id} updated")
         return result, 200
 
-    @use_kwargs(car_args)
+    @use_kwargs(schemes.CAR_ARGS)
     def post(self, **kwargs):
-        car = Car(**kwargs)
+        car = db_models.Car(**kwargs)
         db.session.add(car)
         db.session.commit()
-        result = car_schema.dump(car)
+        result = schemes.CAR_SCHEMA.dump(car)
         logger.info(f"\nCar with id={result['id']} added")
         return result, 201
 
 
 class CarList(Resource):
-    @use_kwargs(filter_args, location="query")
+    @use_kwargs(schemes.FILTER_ARGS, location="query")
     def get(self, **filter_args):
-        car_list = Car.query.filter_by(**filter_args).all()
-        list_of_cars = [car_schema.dump(car) for car in car_list]
+        car_list = db_models.Car.query.filter_by(**filter_args).all()
+        list_of_cars = [schemes.CAR_SCHEMA.dump(car) for car in car_list]
         logger.info(f"\nGet {len(list_of_cars)} cars")
         return {"Cars": list_of_cars}
 
