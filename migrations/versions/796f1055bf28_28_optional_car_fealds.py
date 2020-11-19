@@ -1,4 +1,4 @@
-"""empty message
+"""Change db model Car - more optional fields now.
 
 Revision ID: 796f1055bf28
 Revises: 
