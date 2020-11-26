@@ -167,9 +167,9 @@ class TestRequestMethods(unittest.TestCase):
     @mock.patch("carapp.db.session")
     def test_post_car(self, MockSession, MockCar):
         CAR = {
-            "id": 100000,
+            "id": 10,
             "car_title": "Supercar",
-            "title": "Supercar_3000",
+            "title": "Supercar-3000",
             "condition": "New",
             "body_type": "Sedan",
             "brand": "Supercar",
@@ -193,8 +193,7 @@ class TestRequestMethods(unittest.TestCase):
             "warranty": "12 months",
             "fuel_consumption": "2l/100km",
             "drivetrain": "4matic",
-            "date_added": "2020-10-21 15:02:54.770364",
-            "user_id": 999,
+            "user_id": 1,
         }
         with app.test_client() as client:
             MockCar.return_value = CAR
@@ -208,7 +207,7 @@ class TestRequestMethods(unittest.TestCase):
     @mock.patch("carapp.db.session")
     def test_put_car(self, MockSession, MockCar):
         CAR = {
-            "id": 100000,
+            "id": 1,
             "car_title": "Supercar",
             "title": "Supercar 3000",
             "condition": "New",
@@ -234,12 +233,11 @@ class TestRequestMethods(unittest.TestCase):
             "warranty": "12 months",
             "fuel_consumption": "2l/100km",
             "drivetrain": "4matic",
-            "date_added": "2020-10-21 15:02:54.770364",
             "user_id": 999,
         }
         with app.test_client() as client:
             MockCar.query.filter_by.update.return_value = CAR
-            response = client.put("/car/100000", json=CAR)
+            response = client.put("/car/1", json=CAR)
             self.assertIsNotNone(response.get_json())
             self.assertIsInstance(response.get_json(), dict)
             self.assertEqual(response.status_code, 200)
