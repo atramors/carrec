@@ -35,6 +35,7 @@ Schema for car-arguments parsing and validation of HTTP request objects.
 """
 
 CAR_ARGS = {
+    "id": fields.Int(),
     "car_title": fields.Str(required=True),
     "title": fields.Str(required=True),
     "condition": fields.Str(required=True),
