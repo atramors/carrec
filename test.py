@@ -1,6 +1,6 @@
 import unittest
 from unittest import mock
-from carapp import app, db, db_models, endpoints
+from carapp import app
 
 
 TEST_USER = {
