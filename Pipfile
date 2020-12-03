@@ -24,6 +24,7 @@ psycopg2-binary = "*"
 flask-sqlalchemy = "*"
 flask-migrate = "*"
 flask-script = "*"
+flask-httpauth = "*"
 
 [requires]
 python_full_version = "3.8.6"
