@@ -1,21 +1,32 @@
 import logging
 from flask_restful import Resource
-from carapp import api, db, db_models, schemes
+from carapp import api, auth, db, db_models, schemes
 from webargs.flaskparser import use_kwargs
+from werkzeug.security import generate_password_hash, check_password_hash
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__file__)
 
 
+# @auth.verify_password
+# def verify_password(username, password):
+#     user = db_models.User.query.filter_by(username, password).first()
+#     if user and check_password_hash(user.get(username), password):
+#         return user
+
+
 class UserData(Resource):
+    @auth.login_required
     def get(self, user_id):
         user = db_models.User.query.get(user_id)
         if user is None:  # Comparision id of objects
             return {"Reason": "User not found", "User_id": user_id}, 404
         result = schemes.USER_SCHEMA.dump(user)
         logger.info(f"\nUser with id={user_id} was called")
+        # import pdb; pdb.set_trace() 
         return result
 
+    @auth.verify_password
     def delete(self, user_id):
         user = db_models.User.query.get(user_id)
         result = schemes.USER_SCHEMA.dump(user)
@@ -32,8 +43,7 @@ class UserData(Resource):
     @use_kwargs(schemes.USER_ARGS)
     def put(self, user_id, **kwargs):
         # 0 or 1 (if updated)
-        user_updated = \
-                db_models.User.query.filter_by(id=user_id).update(kwargs)
+        user_updated = db_models.User.query.filter_by(id=user_id).update(kwargs)
         if not user_updated:
             logger.error(f"\nNo User with id={user_id}")
             return {"Reason": "No such User", "User_id": user_id}, 404
@@ -44,6 +54,8 @@ class UserData(Resource):
 
     @use_kwargs(schemes.USER_ARGS)
     def post(self, **kwargs):
+        hashed_password = generate_password_hash(kwargs["password"], method="sha256")
+        kwargs["password"] = hashed_password
         user = db_models.User(**kwargs)
         db.session.add(user)
         db.session.commit()
