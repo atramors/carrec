@@ -1,4 +1,3 @@
-import flask_bcrypt as fb
 from flask_httpauth import HTTPBasicAuth
 from flask_migrate import Migrate, MigrateCommand
 from flask import Flask
@@ -30,7 +29,5 @@ migrate = Migrate(app, db, compare_type=True)
 manager = Manager(app)
 manager.add_command("db", MigrateCommand)
 
-
-bcrypt = fb.Bcrypt(app)
 
 from carapp import endpoints

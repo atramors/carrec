@@ -8,25 +8,15 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__file__)
 
 
-# @auth.verify_password
-# def verify_password(username, password):
-#     user = db_models.User.query.filter_by(username, password).first()
-#     if user and check_password_hash(user.get(username), password):
-#         return user
-
-
 class UserData(Resource):
-    @auth.login_required
     def get(self, user_id):
         user = db_models.User.query.get(user_id)
         if user is None:  # Comparision id of objects
             return {"Reason": "User not found", "User_id": user_id}, 404
         result = schemes.USER_SCHEMA.dump(user)
         logger.info(f"\nUser with id={user_id} was called")
-        # import pdb; pdb.set_trace() 
         return result
 
-    @auth.verify_password
     def delete(self, user_id):
         user = db_models.User.query.get(user_id)
         result = schemes.USER_SCHEMA.dump(user)
