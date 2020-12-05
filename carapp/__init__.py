@@ -1,4 +1,5 @@
 import flask_bcrypt as fb
+from flask_httpauth import HTTPBasicAuth
 from flask_migrate import Migrate, MigrateCommand
 from flask import Flask
 from flask_restful import Api
@@ -8,6 +9,7 @@ from os.path import expanduser
 
 app = Flask(__name__)
 api = Api(app)
+auth = HTTPBasicAuth()
 
 """
 Database config.
@@ -24,7 +26,7 @@ db = SQLAlchemy(app)
 Database migrations.
 """
 
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, compare_type=True)
 manager = Manager(app)
 manager.add_command("db", MigrateCommand)
 
