@@ -1,8 +1,8 @@
 import logging
 from flask_restful import Resource
-from carapp import api, auth, db, db_models, schemes
+from carapp import api, db, db_models, schemes
 from webargs.flaskparser import use_kwargs
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__file__)
@@ -32,6 +32,8 @@ class UserData(Resource):
 
     @use_kwargs(schemes.USER_ARGS)
     def put(self, user_id, **kwargs):
+        hashed_password = generate_password_hash(kwargs["password"], method="sha256")
+        kwargs["password"] = hashed_password
         # 0 or 1 (if updated)
         user_updated = db_models.User.query.filter_by(id=user_id).update(kwargs)
         if not user_updated:
