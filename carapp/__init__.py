@@ -1,3 +1,4 @@
+import os
 from flask_httpauth import HTTPBasicAuth
 from flask_migrate import Migrate, MigrateCommand
 from flask import Flask
@@ -5,10 +6,13 @@ from flask_restful import Api
 from flask_script import Manager
 from flask_sqlalchemy import SQLAlchemy
 from os.path import expanduser
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 api = Api(app)
 auth = HTTPBasicAuth()
+app.config["SECRET_KEY"] = os.getenv("SECRET")
 
 """
 Database config.

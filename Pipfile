@@ -25,6 +25,7 @@ flask-migrate = "*"
 flask-script = "*"
 flask-httpauth = "*"
 flask-login = "*"
+python-dotenv = "*"
 
 [requires]
 python_full_version = "3.8.6"

@@ -3,3 +3,4 @@ mlruns/*
 carapp/__pycache__/*
 .DS_Store
 carapp/site.db
+carapp/.env
