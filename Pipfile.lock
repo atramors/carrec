@@ -54,11 +54,11 @@
         },
         "cachetools": {
             "hashes": [
-                "sha256:513d4ff98dd27f85743a8dc0e92f55ddb1b49e060c2d5961512855cda2c01a98",
-                "sha256:bbaa39c3dede00175df2dc2b03d0cf18dd2d32a7de7beb68072d13043c9edb20"
+                "sha256:3796e1de094f0eaca982441c92ce96c68c89cced4cd97721ab297ea4b16db90e",
+                "sha256:c6b07a6ded8c78bf36730b3dc452dfff7d95f2a12a2fed856b1a0cb13ca78c61"
             ],
             "markers": "python_version ~= '3.5'",
-            "version": "==4.1.1"
+            "version": "==4.2.0"
         },
         "certifi": {
             "hashes": [
@@ -161,11 +161,11 @@
         },
         "google-auth": {
             "hashes": [
-                "sha256:5176db85f1e7e837a646cd9cede72c3c404ccf2e3373d9ee14b2db88febad440",
-                "sha256:b728625ff5dfce8f9e56a499c8a4eb51443a67f20f6d28b67d5774c310ec4b6b"
+                "sha256:0b0e026b412a0ad096e753907559e4bdb180d9ba9f68dd9036164db4fdc4ad2e",
+                "sha256:ce752cc51c31f479dbf9928435ef4b07514b20261b021c7383bee4bda646acb8"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==1.23.0"
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'",
+            "version": "==1.24.0"
         },
         "google-auth-oauthlib": {
             "hashes": [
@@ -742,7 +742,7 @@
                 "sha256:109ea5a66744dd859bf16fe904b8d8b627adafb9408753161e766a92e7d681fa",
                 "sha256:6166864e23d6b5195a5cfed6cd9fed0fe774e226d8f854fcb23b7bbef0350233"
             ],
-            "markers": "python_version >= '3.5'",
+            "markers": "python_version >= '3.6'",
             "version": "==4.6"
         },
         "scikit-learn": {
@@ -918,11 +918,11 @@
         },
         "webargs": {
             "hashes": [
-                "sha256:2ead6ce38559152043ab4ada4d389aef6c804b0c169482e7c92b3f498f690b2c",
-                "sha256:412ecadd977afdea0ed6fa5f5b65ddd13a099269e622ec537f9c74c443ce4d0b"
+                "sha256:0912f387bcff35c5d53ffb953f0008e7cbfdc68ae0d062b5eb8a4a2fec837e37",
+                "sha256:33db09f47576d9ec35b1fce9da06c2f08a1d2b41c38f9612404d0ca7320c596a"
             ],
             "index": "pypi",
-            "version": "==6.1.1"
+            "version": "==7.0.0"
         },
         "werkzeug": {
             "hashes": [
