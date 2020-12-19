@@ -1,5 +1,6 @@
 import os
-from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPTokenAuth
+from flask_login import LoginManager
 from flask_migrate import Migrate, MigrateCommand
 from flask import Flask
 from flask_restful import Api
@@ -7,12 +8,16 @@ from flask_script import Manager
 from flask_sqlalchemy import SQLAlchemy
 from os.path import expanduser
 from dotenv import load_dotenv
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
 load_dotenv()
 
 app = Flask(__name__)
 api = Api(app)
-auth = HTTPBasicAuth()
+
 app.config["SECRET_KEY"] = os.getenv("SECRET")
+token_serializer = Serializer(app.config["SECRET_KEY"], expires_in=3600)
+auth = HTTPTokenAuth("Bearer")
 
 """
 Database config.
@@ -34,4 +39,7 @@ manager = Manager(app)
 manager.add_command("db", MigrateCommand)
 
 
-from carapp import endpoints
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+from carapp import endpoints, authent
