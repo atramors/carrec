@@ -129,7 +129,7 @@ class CarList(Resource):
         return {"Cars": list_of_cars}
 
 
-api.add_resource(UserSignUp, "/user/signup", methods=["POST"])
+api.add_resource(UserSignUp, "/signup", methods=["POST"])
 api.add_resource(UserData, "/user", "/user/<int:user_id>")
 api.add_resource(UserList, "/users", methods=["GET"])
 api.add_resource(CarData, "/car", "/car/<int:id>")
