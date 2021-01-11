@@ -2,7 +2,7 @@ import logging
 import flask
 import flask_login
 from flask_restful import Resource
-from carapp import api, app, auth, db, db_models, schemes, token_serializer
+from carapp import api, auth, db, db_models, schemes, token_serializer
 from webargs.flaskparser import use_kwargs
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -46,7 +46,7 @@ class UserLogout(Resource):
     @auth.login_required
     def post(self):
         flask_login.logout_user()
-        return flask.redirect("/login", code=302)
+        return {"message": "You are not logged in!"}, 200
 
 
 class UserData(Resource):
