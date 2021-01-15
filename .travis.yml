@@ -1,7 +1,8 @@
-os: osx
 language: python
-python:
-        - "3.8"
+jobs:
+  include:
+    - name: "Python 3.8.6 on macOS"
+      os: osx
 install:
         - pipenv install
 script: "python3 test.py""
