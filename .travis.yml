@@ -3,4 +3,4 @@ python:
         - "3.8"
 install:
         - pipenv install
-script: unittest
+script: python3 test.py
