@@ -4,4 +4,4 @@ python:
         - "3.8"
 install:
         - pipenv install
-script: python3 test.py
+script: "python3 test.py""
