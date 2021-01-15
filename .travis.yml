@@ -1,7 +1,7 @@
 os: osx
 language: python
 python:
-        - "3.8.6"
+        - "3.8"
 install:
         - pipenv install
 script: python3 test.py
