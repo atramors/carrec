@@ -8,9 +8,5 @@ def user_loader(user_id):
 
 @auth.verify_token
 def verify_token(token):
-    try:
-        data = token_serializer.loads(token)
-    except:
-        return False
-    if "username" in data:
-        return data["username"]
+    data = token_serializer.loads(token)
+    return data.get("username", False)
