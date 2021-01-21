@@ -1,0 +1,31 @@
+matrix: 
+  include: 
+    - name: "Python 3.9.1 on macOS" 
+      os: osx 
+      osx_image: xcode12 # Xcode 12.0.1 images have the following SDKs preinstalled: macosx10.15
+      language: shell       # language: python' is an error on Travis CI macOS
+
+addons: # addons because we are using brew for travis
+  homebrew: 
+    packages: 
+      - python 
+      - pipenv
+
+install: 
+  - pipenv install
+
+sudo:
+  - false
+
+before_script: 
+  - echo "localhost:5432:newbase:postgres:postgres" > /Users/travis/.pgpass
+  - chmod 0600 ~/.pgpass
+  - postgres --version
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf /usr/local/var/postgres; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then initdb /usr/local/var/postgres; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pg_ctl -D /usr/local/var/postgres start; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then createuser -s postgres; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then psql -c 'create database newbase;' -U postgres; fi
+
+script: 
+  - pipenv run python -m unittest
