@@ -1,13 +1,14 @@
 import os
+from os.path import expanduser
+
+from dotenv import load_dotenv
+from flask import Flask
 from flask_httpauth import HTTPTokenAuth
 from flask_login import LoginManager
 from flask_migrate import Migrate, MigrateCommand
-from flask import Flask
 from flask_restful import Api
 from flask_script import Manager
 from flask_sqlalchemy import SQLAlchemy
-from os.path import expanduser
-from dotenv import load_dotenv
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 load_dotenv()
@@ -42,4 +43,4 @@ manager.add_command("db", MigrateCommand)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-from carapp import endpoints, authent
+from carapp import endpoints, authent  # isort:skip

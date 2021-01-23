@@ -1,10 +1,12 @@
 import logging
+
 import flask
 import flask_login
 from flask_restful import Resource
-from carapp import api, auth, db, db_models, schemes, token_serializer
 from webargs.flaskparser import use_kwargs
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from carapp import api, auth, db, db_models, schemes, token_serializer
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
 logger = logging.getLogger(__file__)
@@ -13,8 +15,7 @@ logger = logging.getLogger(__file__)
 class UserSignUp(Resource):
     @use_kwargs(schemes.USER_ARGS)
     def post(self, **kwargs):
-        hashed_password = generate_password_hash(kwargs["password"],
-                                                 method="sha256")
+        hashed_password = generate_password_hash(kwargs["password"], method="sha256")
         kwargs["password"] = hashed_password
         user = db_models.User(**kwargs)
         db.session.add(user)
@@ -32,7 +33,7 @@ class UserLogin(Resource):
 
         user = db_models.User.query.filter_by(username=check_auth.username).first()
         if not user:
-            return {"message": f"User {check_auth.username} doesn't exist."},
+            return ({"message": f"User {check_auth.username} doesn't exist."},)
         401
         if check_password_hash(user.password, check_auth.password):
             token = token_serializer.dumps({"username": user.username}).decode("utf-8")
@@ -76,8 +77,7 @@ class UserData(Resource):
     @auth.login_required
     @use_kwargs(schemes.USER_ARGS)
     def put(self, user_id, **kwargs):
-        hashed_password = generate_password_hash(kwargs["password"],
-                                                 method="sha256")
+        hashed_password = generate_password_hash(kwargs["password"], method="sha256")
         kwargs["password"] = hashed_password
         # 0 or 1 (if updated)
         user_updated = db_models.User.query.filter_by(id=user_id).update(kwargs)
