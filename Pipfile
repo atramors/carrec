@@ -25,7 +25,7 @@ flask-script = "*"
 flask-httpauth = "*"
 flask-login = "*"
 python-dotenv = "*"
-tensorflow = "*"
+# tensorflow = "*"
 
 [requires]
-python_full_version = "3.8.6"
+python_full_version = "3.9.1"
